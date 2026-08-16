@@ -3,7 +3,8 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 
 SOURCE_URL = "https://ext.greektv.app/epg/epg.xml"
-OUTPUT_FILE = "epg_ssiptv.xml"
+OUTPUT_DIR = "public"
+OUTPUT_FILE = "public/epg_ssiptv.xml"
 
 CHANNELS = {
     "ert1",
@@ -63,6 +64,9 @@ CHANNELS = {
 }
 
 print("Lade originale EPG herunter...")
+
+import os
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 request = urllib.request.Request(
     SOURCE_URL,
@@ -143,8 +147,6 @@ tree.write(
 )
 
 print(f"Programme übernommen: {program_count}")
-
-import os
 
 size = os.path.getsize(OUTPUT_FILE)
 
