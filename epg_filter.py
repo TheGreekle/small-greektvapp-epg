@@ -64,8 +64,21 @@ CHANNELS = {
 
 print("Lade originale EPG herunter...")
 
-with urllib.request.urlopen(SOURCE_URL, timeout=120) as response:
+request = urllib.request.Request(
+    SOURCE_URL,
+    headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept": "application/xml,text/xml,*/*",
+        "Accept-Encoding": "gzip, deflate",
+    }
+)
+
+with urllib.request.urlopen(request, timeout=120) as response:
     data = response.read()
+
+    if response.headers.get("Content-Encoding") == "gzip":
+        import gzip
+        data = gzip.decompress(data)
 
 print(f"Originalgröße: {len(data) / 1024 / 1024:.2f} MB")
 
