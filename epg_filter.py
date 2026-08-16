@@ -148,6 +148,53 @@ tree.write(
 
 print(f"Programme übernommen: {program_count}")
 
+# Kontrolle der enthaltenen Sender
+output_channel_ids = {
+    channel.get("id")
+    for channel in new_root.findall("channel")
+}
+
+missing_channels = CHANNELS - output_channel_ids
+extra_channels = output_channel_ids - CHANNELS
+
+print("")
+print("========== EPG KONTROLLE ==========")
+print(f"Gewünschte Sender: {len(CHANNELS)}")
+print(f"Gefundene Sender:  {len(output_channel_ids)}")
+print(f"Programme:         {program_count}")
+
+if missing_channels:
+    print("")
+    print("FEHLER: Folgende gewünschte Sender fehlen:")
+    for channel in sorted(missing_channels):
+        print(f"  - {channel}")
+else:
+    print("Alle gewünschten Sender sind vorhanden.")
+
+if extra_channels:
+    print("")
+    print("FEHLER: Folgende unerwartete Sender sind enthalten:")
+    for channel in sorted(extra_channels):
+        print(f"  - {channel}")
+else:
+    print("Keine unerwünschten Sender enthalten.")
+
+size = os.path.getsize(OUTPUT_FILE)
+
+print("")
+print(f"Originalgröße:      {len(data) / 1024 / 1024:.2f} MB")
+print(f"Neue EPG-Größe:     {size / 1024 / 1024:.2f} MB")
+print(f"Zeitraum:           {date_from} bis {date_to}")
+print(f"Ausgabedatei:       {OUTPUT_FILE}")
+print("====================================")
+
+# Workflow mit Fehler beenden, falls Sender fehlen oder zusätzliche
+# Sender vorhanden sind.
+if missing_channels or extra_channels:
+    raise RuntimeError("EPG-Senderkontrolle fehlgeschlagen.")
+
+print("EPG-Kontrolle erfolgreich.")
+
 size = os.path.getsize(OUTPUT_FILE)
 
 print(
