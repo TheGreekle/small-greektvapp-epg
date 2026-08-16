@@ -1,6 +1,6 @@
 # small-greektvapp-epg
 
-smaller than 5 MB - automatic for greek iptv lists or apps like ss iptv
+smaller than 3 MB - automatic for greek iptv lists or apps like ss iptv
 
 https://thegreekle.github.io/small-greektvapp-epg/epg_ssiptv.xml
 
