@@ -2,7 +2,7 @@
 
 smaller than 3 MB - automatic for greek iptv lists or apps like ss iptv
 
-https://thegreekle.github.io/small-greektvapp-epg/epg_ssiptv.xml
+#EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/epg_ssiptv.xml"
 
 m3u tvg-id (54 Channels): 
 
