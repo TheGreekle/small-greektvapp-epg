@@ -9,12 +9,10 @@ on:
   # 03:00 UTC
   # 15:00 UTC
   #
-  # Damit entstehen zwei verschiedene 24-Stunden-Fenster:
-  #
-  # 03:00-Lauf:
+  # 03:00 UTC:
   # 00:00 -> 00:00 nächster Tag
   #
-  # 15:00-Lauf:
+  # 15:00 UTC:
   # 12:00 -> 12:00 nächster Tag
   schedule:
     - cron: "0 3,15 * * *"
@@ -70,9 +68,15 @@ jobs:
 
       # ------------------------------------------------------
       # EPG herunterladen und filtern
+      #
+      # Sicherheits-Timeout:
+      # Nach 15 Minuten wird dieser Step beendet.
+      # Dadurch kann ein hängender Download oder Prozess
+      # den Workflow nicht unbegrenzt laufen lassen.
       # ------------------------------------------------------
 
       - name: EPG filtern
+        timeout-minutes: 15
         run: python epg_filter.py
 
 
