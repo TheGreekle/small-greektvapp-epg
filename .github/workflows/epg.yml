@@ -1,46 +1,97 @@
 name: Update EPG
 
 on:
+  # Manuelles Starten weiterhin möglich
   workflow_dispatch:
 
+  # Zweimal täglich:
+  # 04:00 UTC = 06:00 Uhr Schweiz im Sommer
+  # 16:00 UTC = 18:00 Uhr Schweiz im Sommer
   schedule:
     - cron: "0 4,16 * * *"
+
+
+# ============================================================
+# BERECHTIGUNGEN
+# ============================================================
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+
+# ============================================================
+# VERHINDERT MEHRERE GLEICHZEITIGE DEPLOYMENTS
+# ============================================================
+
 concurrency:
   group: "pages"
   cancel-in-progress: true
+
+
+# ============================================================
+# BUILD
+# ============================================================
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+
+      # ------------------------------------------------------
+      # Repository herunterladen
+      # ------------------------------------------------------
+
       - name: Repository auschecken
         uses: actions/checkout@v6
+
+
+      # ------------------------------------------------------
+      # Python einrichten
+      # ------------------------------------------------------
 
       - name: Python einrichten
         uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
+
+      # ------------------------------------------------------
+      # EPG herunterladen und auf
+      # HEUTE + MORGEN + 13 Sender reduzieren
+      # ------------------------------------------------------
+
       - name: EPG filtern
         run: python epg_filter.py
 
+
+      # ------------------------------------------------------
+      # GitHub Pages vorbereiten
+      # ------------------------------------------------------
+
       - name: GitHub Pages vorbereiten
         uses: actions/configure-pages@v6
+
+
+      # ------------------------------------------------------
+      # Erzeugte EPG-Datei für GitHub Pages bereitstellen
+      # ------------------------------------------------------
 
       - name: EPG für Pages vorbereiten
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
 
+
+# ============================================================
+# DEPLOY
+# ============================================================
+
   deploy:
     needs: build
+
     runs-on: ubuntu-latest
 
     environment:
@@ -48,6 +99,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+
+      # ------------------------------------------------------
+      # EPG veröffentlichen
+      # ------------------------------------------------------
+
       - name: EPG veröffentlichen
         id: deployment
         uses: actions/deploy-pages@v5
