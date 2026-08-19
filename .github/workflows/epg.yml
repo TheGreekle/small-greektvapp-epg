@@ -5,10 +5,19 @@ on:
   workflow_dispatch:
 
   # Zweimal täglich:
-  # 04:00 UTC = 06:00 Uhr Schweiz im Sommer
-  # 16:00 UTC = 18:00 Uhr Schweiz im Sommer
+  #
+  # 03:00 UTC
+  # 15:00 UTC
+  #
+  # Damit entstehen zwei verschiedene 24-Stunden-Fenster:
+  #
+  # 03:00-Lauf:
+  # 00:00 -> 00:00 nächster Tag
+  #
+  # 15:00-Lauf:
+  # 12:00 -> 12:00 nächster Tag
   schedule:
-    - cron: "0 4,16 * * *"
+    - cron: "0 3,15 * * *"
 
 
 # ============================================================
@@ -35,13 +44,14 @@ concurrency:
 # ============================================================
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
     steps:
 
       # ------------------------------------------------------
-      # Repository herunterladen
+      # Repository auschecken
       # ------------------------------------------------------
 
       - name: Repository auschecken
@@ -59,8 +69,7 @@ jobs:
 
 
       # ------------------------------------------------------
-      # EPG herunterladen und auf
-      # HEUTE + MORGEN + 13 Sender reduzieren
+      # EPG herunterladen und filtern
       # ------------------------------------------------------
 
       - name: EPG filtern
@@ -76,7 +85,7 @@ jobs:
 
 
       # ------------------------------------------------------
-      # Erzeugte EPG-Datei für GitHub Pages bereitstellen
+      # EPG für GitHub Pages bereitstellen
       # ------------------------------------------------------
 
       - name: EPG für Pages vorbereiten
