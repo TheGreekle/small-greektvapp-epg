@@ -49,7 +49,12 @@ CHANNELS = {
     "riksat",
     "omega",
     "ant1cy",
-    "sigma"
+    "sigma",
+    "berginacy",
+    "rikhd",
+    "rik1",
+    "rik2",
+    "Naftemporikitv"
 }
 
 
