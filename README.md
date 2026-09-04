@@ -6,35 +6,21 @@
 
 • automatically for greek iptv lists or apps like ss iptv 
 
-• 30 Channels 
-
+• 30 Channels : 
 • m3u tvg-id : 
-
-   ert1  ert2  ert3 
-
-   mega  ant1  alfa 
-               
-   skai  open  star 
-               
-   starint   mtv 
-               
-   tv100     onetv 
-               
-   vouli     ertworld 
-               
-   ertnews   meganews 
-               
-   pronews   action24 
-               
-   ertsports  ertsports2 
-               
-   riksat  omega  ant1cy 
-               
-   sigma   berginacy 
-               
-   rikhd   rik1   rik2 
-               
-   Naftemporikitv 
+• ert1 • ert2 • ert3 
+• mega • ant1 • alfa 
+• skai • open • star 
+• starint • mtv 
+• tv100 • onetv 
+• vouli • ertworld 
+• ertnews • meganews 
+• pronews • action24 
+• ertsports • ertsports2 
+• riksat • omega • ant1cy 
+• sigma •  berginacy 
+• rikhd • rik1 • rik2 
+• Naftemporikitv • 
                
 ———____________________________———
 
