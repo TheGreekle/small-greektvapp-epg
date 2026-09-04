@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tv>
+  <channel id="alfa">
+    <display-name>alfa</display-name>
+  </channel>
+  <programme start="20260903190000 +0200" stop="20260903200000 +0200" channel="alfa">
+    <title lang="el">Test EPG</title>
+    <desc>SS IPTV Cloudflare Test</desc>
+  </programme>
+</tv>
