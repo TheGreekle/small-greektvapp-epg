@@ -8,7 +8,9 @@
 
 • 30 Channels 
 
-• m3u tvg-id : ert1  ert2  ert3 
+• m3u tvg-id : 
+
+               ert1  ert2  ert3 
 
                mega  ant1  alfa 
                
