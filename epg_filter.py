@@ -16,8 +16,8 @@ OUTPUT_DIR = "public"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "epg_ssiptv.xml")
 
 # Maximale erlaubte Dateigröße:
-# 499.000 Bytes ≈ 0,5 MB
-MAX_OUTPUT_SIZE = 499_000
+# 490.000 Bytes ≈ 0,5 MB
+MAX_OUTPUT_SIZE = 490_000
 
 
 # ============================================================
