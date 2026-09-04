@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tv>
-  <channel id="alfa">
-    <display-name>alfa</display-name>
+  <channel id="alpha">
+    <display-name>alpha</display-name>
   </channel>
   <programme start="20260904070000 +0200" stop="20260904080000 +0200" channel="alfa">
     <title lang="el">Test EPG</title>
