@@ -43,7 +43,6 @@ CHANNELS = {
     "ertnews",
     "meganews",
     "pronews",
-    "Naftemporikitv",
     "ertsports",
     "ertsports2",
     "action24",
