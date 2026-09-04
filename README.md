@@ -6,8 +6,8 @@
 
 • automatically for greek iptv lists or apps like ss iptv 
 
-• 30 Channels : 
-• m3u tvg-id : 
+• 30 Channels 
+• m3u tvg-id's: 
 • ert1 • ert2 • ert3 
 • mega • ant1 • alfa 
 • skai • open • star 
@@ -22,8 +22,8 @@
 • rikhd • rik1 • rik2 
 • Naftemporikitv • 
                
-———____________________________———
+———__________________________________———
 
-• Android users can also use the app on the website "greektv.app" 
+• Android users can also use the app on the website "https://greektv.app" 
 
-___————————————————————————————___
+———__________________________________———
