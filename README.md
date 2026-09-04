@@ -1,4 +1,4 @@
-# small-greektvapp-epg
+# Small-greektv.app-EPG
 
 #EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/epg_ssiptv.xml"
 
@@ -10,32 +10,34 @@
 
 • m3u tvg-id : 
 
-               ert1  ert2  ert3 
+   ert1  ert2  ert3 
 
-               mega  ant1  alfa 
+   mega  ant1  alfa 
                
-               skai  open  star 
+   skai  open  star 
                
-               starint     mtv 
+   starint   mtv 
                
-               tv100       onetv 
+   tv100     onetv 
                
-               vouli       ertworld 
+   vouli     ertworld 
                
-               ertnews     meganews 
+   ertnews   meganews 
                
-               pronews     action24 
+   pronews   action24 
                
-               ertsports   ertsports2 
+   ertsports  ertsports2 
                
-               riksat  omega  ant1cy 
+   riksat  omega  ant1cy 
                
-               sigma   berginacy 
+   sigma   berginacy 
                
-               rikhd   rik1   rik2 
+   rikhd   rik1   rik2 
                
-               Naftemporikitv 
+   Naftemporikitv 
                
 ———____________________________———
 
-• Android users can also use the app on the website "greektv.app"
+• Android users can also use the app on the website "greektv.app" 
+
+___————————————————————————————___
