@@ -690,7 +690,7 @@ if size > MAX_OUTPUT_SIZE:
 
     raise RuntimeError(
         "EPG-Datei überschreitet "
-        "das Limit von 0,46 MB."
+        "das Limit von 0,499 MB."
     )
 
 
@@ -715,7 +715,7 @@ print(
 
 print(
     "Dateigröße liegt unter "
-    "0,46 MB."
+    "0,5 MB."
 )
 
 print(
