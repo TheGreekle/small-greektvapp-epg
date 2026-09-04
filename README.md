@@ -1,4 +1,4 @@
-# Small-greektv.app-EPG
+# Small-greektv.app-EPG 🇬🇷 
 
 #EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/epg_ssiptv.xml"
 
@@ -9,7 +9,7 @@
 • 30 Channels 
 • m3u tvg-id's: 
 • ert1 • ert2 • ert3 
-• mega • ant1 • alfa 
+• mega • ant1 • alpha 
 • skai • open • star 
 • starint • mtv 
 • tv100 • onetv 
@@ -24,6 +24,6 @@
                
 ———__________________________________———
 
-• Android users can also use the app on the website "https://greektv.app" 
+• Android users can also use/install the app on/from the website "https://greektv.app" 🇬🇷 
 
 ———__________________________________———
