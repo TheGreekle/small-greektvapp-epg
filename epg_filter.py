@@ -16,8 +16,8 @@ OUTPUT_DIR = "public"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "epg_ssiptv.xml")
 
 # Maximale erlaubte Dateigröße:
-# 460.000 Bytes = 0,46 MB
-MAX_OUTPUT_SIZE = 460_000
+# 499.000 Bytes ≈ 0,5 MB
+MAX_OUTPUT_SIZE = 499_000
 
 
 # ============================================================
@@ -30,7 +30,7 @@ CHANNELS = {
     "ert3",
     "mega",
     "ant1",
-    "alfa",
+    "alpha",
     "skai",
     "open",
     "star",
@@ -39,6 +39,18 @@ CHANNELS = {
     "onetv",
     "mtv",
     "vouli",
+    "ertworld",
+    "ertnews",
+    "meganews",
+    "pronews",
+    "Naftemporikitv",
+    "ertsports",
+    "ertsports2",
+    "action24",
+    "riksat",
+    "omega",
+    "ant1cy",
+    "sigma"
 }
 
 
