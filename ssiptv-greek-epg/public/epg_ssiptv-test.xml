@@ -3,7 +3,7 @@
   <channel id="alpha">
     <display-name>alpha</display-name>
   </channel>
-  <programme start="20260904070000 +0200" stop="20260904080000 +0200" channel="alfa">
+  <programme start="20260904070000 +0200" stop="20260904080000 +0200" channel="alpha">
     <title lang="el">Test EPG</title>
     <desc>SS IPTV Cloudflare Test</desc>
   </programme>
