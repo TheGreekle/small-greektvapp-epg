@@ -23,7 +23,7 @@ on:
 # ============================================================
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -98,6 +98,46 @@ jobs:
           path: ./public
 
 
+      # ------------------------------------------------------
+      # EPG in das Cloudflare-Verzeichnis verschieben
+      # ------------------------------------------------------
+
+      - name: EPG für Cloudflare bereitstellen
+        run: |
+          mkdir -p ssiptv-greek-epg/public
+          cp public/epg_ssiptv.xml ssiptv-greek-epg/public/epg_ssiptv.xml
+
+
+      # ------------------------------------------------------
+      # Prüfen, ob die Cloudflare-XML-Datei wirklich vorhanden ist
+      # ------------------------------------------------------
+
+      - name: EPG-Datei kontrollieren
+        run: |
+          echo "Cloudflare EPG:"
+          ls -lh ssiptv-greek-epg/public/epg_ssiptv.xml
+
+          echo ""
+          echo "Dateigröße:"
+          wc -c ssiptv-greek-epg/public/epg_ssiptv.xml
+
+
+      # ------------------------------------------------------
+      # EPG ins Repository committen
+      # ------------------------------------------------------
+
+      - name: EPG committen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add ssiptv-greek-epg/public/epg_ssiptv.xml
+
+          git diff --cached --quiet || git commit -m "Test: Update Cloudflare EPG"
+
+          git push
+
+          
 # ============================================================
 # DEPLOY
 # ============================================================
