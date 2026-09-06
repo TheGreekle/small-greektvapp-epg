@@ -75,6 +75,32 @@ jobs:
         timeout-minutes: 15
         run: python epg_filter.py
 
+      - name: Prüfen ob XML erstellt wurde
+        run: |
+          echo "================================"
+          echo "EPG DATEI KONTROLLE"
+          echo "================================"
+
+          pwd
+
+          echo ""
+          echo "public Verzeichnis:"
+          ls -lah public || true
+
+          echo ""
+          echo "EPG-Datei prüfen:"
+
+          if [ -f "public/epg_ssiptv.xml" ]; then
+            echo "OK: epg_ssiptv.xml wurde erstellt."
+            ls -lh public/epg_ssiptv.xml
+            echo ""
+            echo "Bytes:"
+            wc -c public/epg_ssiptv.xml
+          else
+            echo "FEHLER: epg_ssiptv.xml wurde NICHT erstellt!"
+            exit 1
+          fi
+
 
       # ------------------------------------------------------
       # GitHub Pages vorbereiten
