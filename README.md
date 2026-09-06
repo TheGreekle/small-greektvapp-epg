@@ -63,7 +63,7 @@ small-greektvapp-epg/
     
         ├── _headers
         
-        └── ssiptv-epg.xml
+        └── ssiptv-epg.xml ("https://raw.githubusercontent.com/TheGreekle/small-greektvapp-epg/refs/heads/main/ssiptv-greek-epg/public/ssiptv-epg.xml")
         
 
  • Build:
