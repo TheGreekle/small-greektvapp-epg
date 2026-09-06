@@ -28,20 +28,66 @@
 
 ———__________________________________———
 
+
+• Construction: 
+
 small-greektvapp-epg/
+
 │
+
 ├── epg_filter.py
+
 │
+
 (├── small-epg.xml => in GitHub-Pages)
+
 │
+
 ├── .github/
+
 │   └── workflows/
+
 │       └── epg.yml
+
 │
+
 └── ssiptv-greek-epg/
+
     │
+    
     ├── wrangler.jsonc
+    
     │
+    
     └── public/
+    
         ├── _headers
+        
         └── ssiptv-epg.xml
+        
+
+ • Build:
+
+                  GitHub Actions
+                  
+                       │
+                       
+                       ▼
+                       
+                 EPG generating
+                 
+                       │
+                       
+              ┌────────┴────────┐
+              
+              ▼                 ▼
+              
+        GitHub Pages       Cloudflare
+       
+       small-epg.xml      ssiptv-epg.xml
+      
+              │                 │
+              
+              ▼                 ▼
+              
+         IPTV Player          SS IPTV
