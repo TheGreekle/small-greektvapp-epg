@@ -1,29 +1,31 @@
 name: Update EPG
 
 on:
+
+  # ----------------------------------------------------------
   # Manuelles Starten weiterhin möglich
+  # ----------------------------------------------------------
+
   workflow_dispatch:
 
-  # Zweimal täglich:
+
+  # ----------------------------------------------------------
+  # Zweimal täglich
   #
-  # 03:00 UTC
-  # 15:00 UTC
-  #
-  # 03:00 UTC:
-  # 00:00 -> 00:00 nächster Tag
-  #
-  # 15:00 UTC:
-  # 12:00 -> 12:00 nächster Tag
+  # 03:00 UTC => 00:00 bis 00:00 nächster Tag
+  # 15:00 UTC => 12:00 bis 12:00 nächster Tag
+  # ----------------------------------------------------------
+
   schedule:
     - cron: "0 3,15 * * *"
 
 
 # ============================================================
-# VERHINDERT MEHRERE GLEICHZEITIGE DEPLOYMENTS
+# VERHINDERT MEHRERE GLEICHZEITIGE AUSFÜHRUNGEN
 # ============================================================
 
 concurrency:
-  group: "pages"
+  group: "epg-update"
   cancel-in-progress: true
 
 
@@ -34,13 +36,14 @@ concurrency:
 jobs:
 
   build:
+
     runs-on: ubuntu-latest
 
-    # BERECHTIGUNGEN BUILD:
     permissions:
       contents: write
       pages: write
       id-token: write
+
 
     steps:
 
@@ -65,126 +68,242 @@ jobs:
       # ------------------------------------------------------
       # EPG herunterladen und filtern
       #
-      # Sicherheits-Timeout:
-      # Nach 15 Minuten wird dieser Step beendet.
-      # Dadurch kann ein hängender Download oder Prozess
-      # den Workflow nicht unbegrenzt laufen lassen.
+      # Ausgabe:
+      # ./public/epg_ssiptv.xml
       # ------------------------------------------------------
 
       - name: EPG filtern
         timeout-minutes: 15
         run: python epg_filter.py
 
-      - name: Prüfen ob XML erstellt wurde
+
+      # ======================================================
+      # ERZEUGTE EPG-DATEI KONTROLLIEREN
+      # ======================================================
+
+      - name: Erzeugte EPG-Datei kontrollieren
         run: |
-          echo "================================"
+
+          echo "========================================"
           echo "EPG DATEI KONTROLLE"
-          echo "================================"
+          echo "========================================"
 
           pwd
 
           echo ""
-          echo "public Verzeichnis:"
+          echo "Public-Verzeichnis:"
           ls -lah public || true
 
           echo ""
-          echo "EPG-Datei prüfen:"
+          echo "EPG-Datei:"
 
           if [ -f "public/epg_ssiptv.xml" ]; then
-            echo "OK: epg_ssiptv.xml wurde erstellt."
+
+            echo "OK: public/epg_ssiptv.xml vorhanden."
+
             ls -lh public/epg_ssiptv.xml
+
             echo ""
-            echo "Bytes:"
+            echo "Dateigröße:"
             wc -c public/epg_ssiptv.xml
+
           else
-            echo "FEHLER: epg_ssiptv.xml wurde NICHT erstellt!"
+
+            echo "FEHLER:"
+            echo "public/epg_ssiptv.xml wurde nicht erstellt!"
+
             exit 1
+
           fi
 
 
-      # ------------------------------------------------------
-      # GitHub Pages vorbereiten
-      # ------------------------------------------------------
+      # ======================================================
+      # GITHUB PAGES VORBEREITEN
+      # ======================================================
 
       - name: GitHub Pages vorbereiten
         uses: actions/configure-pages@v6
 
 
-      # ------------------------------------------------------
-      # EPG für GitHub Pages bereitstellen
-      # ------------------------------------------------------
+      # ======================================================
+      # GITHUB PAGES DATEI ERSTELLEN
+      #
+      # Die Python-Ausgabe heißt:
+      #
+      # public/epg_ssiptv.xml
+      #
+      # Auf GitHub Pages soll sie aber heißen:
+      #
+      # small-epg.xml
+      # ======================================================
 
-      - name: EPG für Pages vorbereiten
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: ./public
-
-
-      # ------------------------------------------------------
-      # EPG in das Cloudflare-Verzeichnis verschieben
-      # ------------------------------------------------------
-
-      - name: EPG für Cloudflare bereitstellen
+      - name: GitHub Pages EPG vorbereiten
         run: |
-          mkdir -p ssiptv-greek-epg/public
-          cp public/epg_ssiptv.xml ssiptv-greek-epg/public/epg_ssiptv.xml
 
+          rm -rf pages-public
 
-      # ------------------------------------------------------
-      # Prüfen, ob die Cloudflare-XML-Datei wirklich vorhanden ist
-      # ------------------------------------------------------
+          mkdir -p pages-public
 
-      - name: EPG-Datei kontrollieren
-        run: |
-          echo "Cloudflare EPG:"
-          ls -lh ssiptv-greek-epg/public/epg_ssiptv.xml
+          cp \
+            public/epg_ssiptv.xml \
+            pages-public/small-epg.xml
+
+          echo "========================================"
+          echo "GITHUB PAGES DATEI"
+          echo "========================================"
+
+          ls -lh pages-public/small-epg.xml
 
           echo ""
           echo "Dateigröße:"
-          wc -c ssiptv-greek-epg/public/epg_ssiptv.xml
+          wc -c pages-public/small-epg.xml
 
 
-      # ------------------------------------------------------
-      # EPG ins Repository committen
-      # ------------------------------------------------------
+      # ======================================================
+      # GITHUB PAGES ARTIFACT HOCHLADEN
+      # ======================================================
 
-      - name: EPG committen
+      - name: EPG für GitHub Pages bereitstellen
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./pages-public
+
+
+      # ======================================================
+      # CLOUDFLARE VERZEICHNIS VORBEREITEN
+      #
+      # Ziel:
+      #
+      # ssiptv-greek-epg/public/ssiptv-epg.xml
+      #
+      # ======================================================
+
+      - name: EPG für Cloudflare vorbereiten
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add ssiptv-greek-epg/public/epg_ssiptv.xml
+          mkdir -p ssiptv-greek-epg/public
 
-          git diff --cached --quiet || git commit -m "Test: Update Cloudflare EPG"
+          cp \
+            public/epg_ssiptv.xml \
+            ssiptv-greek-epg/public/ssiptv-epg.xml
 
-          git push
+          echo "========================================"
+          echo "CLOUDFLARE EPG"
+          echo "========================================"
 
-          
+          ls -lh \
+            ssiptv-greek-epg/public/ssiptv-epg.xml
+
+          echo ""
+          echo "Dateigröße:"
+          wc -c \
+            ssiptv-greek-epg/public/ssiptv-epg.xml
+
+
+      # ======================================================
+      # CLOUDFLARE DATEI KONTROLLIEREN
+      # ======================================================
+
+      - name: Cloudflare EPG kontrollieren
+        run: |
+
+          echo "========================================"
+          echo "CLOUDFLARE DATEI KONTROLLE"
+          echo "========================================"
+
+          if [ \
+            -f "ssiptv-greek-epg/public/ssiptv-epg.xml" \
+          ]; then
+
+            echo "OK: ssiptv-epg.xml vorhanden."
+
+            ls -lh \
+              ssiptv-greek-epg/public/ssiptv-epg.xml
+
+            echo ""
+            echo "Bytes:"
+
+            wc -c \
+              ssiptv-greek-epg/public/ssiptv-epg.xml
+
+          else
+
+            echo "FEHLER:"
+            echo \
+              "ssiptv-greek-epg/public/ssiptv-epg.xml fehlt!"
+
+            exit 1
+
+          fi
+
+
+      # ======================================================
+      # CLOUDFLARE EPG INS REPOSITORY COMMITTEN
+      #
+      # Cloudflare ist mit dem Repository verbunden.
+      #
+      # Der Push löst anschließend automatisch den
+      # Cloudflare Build aus.
+      # ======================================================
+
+      - name: Cloudflare EPG committen
+        run: |
+
+          git config user.name \
+            "github-actions[bot]"
+
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+
+          git add \
+            ssiptv-greek-epg/public/ssiptv-epg.xml
+
+
+          if git diff --cached --quiet; then
+
+            echo "Keine Änderung an der Cloudflare EPG."
+
+          else
+
+            git commit \
+              -m "Update Cloudflare EPG"
+
+            git push
+
+          fi
+
+
 # ============================================================
-# DEPLOY
+# DEPLOY GITHUB PAGES
 # ============================================================
 
   deploy:
+
     needs: build
 
     runs-on: ubuntu-latest
-    
-    # BERECHTIGUNGEN DEPLOY:
+
     permissions:
       contents: read
       pages: write
       id-token: write
 
+
     environment:
+
       name: github-pages
+
       url: ${{ steps.deployment.outputs.page_url }}
+
 
     steps:
 
       # ------------------------------------------------------
-      # EPG veröffentlichen
+      # GitHub Pages veröffentlichen
       # ------------------------------------------------------
 
       - name: EPG veröffentlichen
         id: deployment
         uses: actions/deploy-pages@v5
+        
