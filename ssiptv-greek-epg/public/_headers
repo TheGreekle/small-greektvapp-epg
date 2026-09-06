@@ -1,4 +1,4 @@
-/epg_ssiptv.xml
+/ssiptv-epg.xml
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, POST, OPTIONS, HEAD
   Access-Control-Allow-Headers: Range
