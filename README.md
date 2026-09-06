@@ -21,15 +21,18 @@
 • sigma •  berginacy 
 • rikhd • rik1 • rik2 
 • Naftemporikitv • 
+
                
-———__________________________________———
+❕———__________________________________———❕
 
-• Android users can also use/install the app on/from the website "https://greektv.app" 🇬🇷 
+• Android users can also use/install the app on/from the website "https://greektv.app" 📺 
 
-———__________________________________———
+• for more information visit: "https://github.com/tvappshq/epg-greece-cyprus" and "https://ko-fi.com/greektvapp" ☕️ 
+
+❕———__________________________________———❕
 
 
-• Construction: 
+• My Construction: 
 
 small-greektvapp-epg/
 
