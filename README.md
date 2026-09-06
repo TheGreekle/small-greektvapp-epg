@@ -1,10 +1,10 @@
 # Small-greektv.app-EPG 🇬🇷 
 
-#EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/epg_ssiptv.xml"
+#EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/small_epg.xml"
 
 • epg xml file is smaller than 0,5 MB 
 
-• automatically for greek iptv lists or apps like ss iptv 
+• automatically for greek iptv lists or apps like GoTV 
 
 • 30 Channels 
 • m3u tvg-id's: 
@@ -27,3 +27,21 @@
 • Android users can also use/install the app on/from the website "https://greektv.app" 🇬🇷 
 
 ———__________________________________———
+
+small-greektvapp-epg/
+│
+├── epg_filter.py
+│
+(├── small-epg.xml => in GitHub-Pages)
+│
+├── .github/
+│   └── workflows/
+│       └── epg.yml
+│
+└── ssiptv-greek-epg/
+    │
+    ├── wrangler.jsonc
+    │
+    └── public/
+        ├── _headers
+        └── ssiptv-epg.xml
