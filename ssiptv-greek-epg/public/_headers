@@ -4,4 +4,4 @@
   Access-Control-Allow-Headers: Range
   Access-Control-Expose-Headers: Accept-Ranges, Content-Encoding, Content-Length, Content-Range
   X-Robots-Tag: noindex, nofollow, noarchive
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=1800
