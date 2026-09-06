@@ -39,7 +39,7 @@ small-greektvapp-epg/
 
 │
 
-(├── small-epg.xml => in GitHub-Pages)
+(├── small-epg.xml => in GitHub Pages: "https://thegreekle.github.io/small-greektvapp-epg/small-epg.xml")
 
 │
 
