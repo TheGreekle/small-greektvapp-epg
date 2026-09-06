@@ -1,6 +1,6 @@
 # Small-greektv.app-EPG 🇬🇷 
 
-#EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/small_epg.xml"
+#EXTM3U x-tvg-url="https://thegreekle.github.io/small-greektvapp-epg/small-epg.xml"
 
 • epg xml file is smaller than 0,5 MB 
 
