@@ -13,10 +13,13 @@ from datetime import datetime, timedelta, timezone
 SOURCE_URL = "https://ext.greektv.app/epg/epg.xml"
 
 OUTPUT_DIR = "public"
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "epg_ssiptv.xml")
+OUTPUT_FILE = os.path.join(
+    OUTPUT_DIR,
+    "epg_ssiptv.xml"
+)
 
 # Maximale erlaubte Dateigröße:
-# 490.000 Bytes ≈ 0,5 MB
+# 490.000 Bytes ≈ 0,49 MB
 MAX_OUTPUT_SIZE = 490_000
 
 
@@ -71,7 +74,10 @@ total_start = time.perf_counter()
 
 print("Lade originale EPG herunter...")
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(
+    OUTPUT_DIR,
+    exist_ok=True
+)
 
 download_start = time.perf_counter()
 
@@ -88,13 +94,24 @@ request = urllib.request.Request(
     }
 )
 
-with urllib.request.urlopen(request, timeout=120) as response:
+with urllib.request.urlopen(
+    request,
+    timeout=120
+) as response:
+
     data = response.read()
 
-    if response.headers.get("Content-Encoding") == "gzip":
+    if response.headers.get(
+        "Content-Encoding"
+    ) == "gzip":
+
         data = gzip.decompress(data)
 
-download_time = time.perf_counter() - download_start
+
+download_time = (
+    time.perf_counter() -
+    download_start
+)
 
 print(
     f"Originalgröße: "
@@ -114,6 +131,7 @@ print(
 parse_start = time.perf_counter()
 
 try:
+
     root = ET.fromstring(data)
 
 except ET.ParseError as error:
@@ -122,7 +140,10 @@ except ET.ParseError as error:
         f"EPG-XML konnte nicht gelesen werden: {error}"
     )
 
-parse_time = time.perf_counter() - parse_start
+parse_time = (
+    time.perf_counter() -
+    parse_start
+)
 
 print(
     f"XML Parsing: "
@@ -136,6 +157,7 @@ print(
 
 now_utc = datetime.now(timezone.utc)
 
+print("")
 print(
     "Aktuelle UTC-Zeit: "
     f"{now_utc.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -143,67 +165,37 @@ print(
 
 
 # ============================================================
-# 24-STUNDEN-FENSTER BESTIMMEN
+# 24-STUNDEN-FENSTER
 # ============================================================
 #
-# 03:00 UTC:
-# 00:00 heute -> 00:00 morgen
+# Das Fenster ist immer:
 #
-# 15:00 UTC:
-# 12:00 heute -> 12:00 morgen
+#   aktuelle UTC-Zeit - 3 Stunden
+#   bis
+#   aktuelle UTC-Zeit + 21 Stunden
+#
+# Dadurch entstehen exakt 24 Stunden.
+#
+# Bei jedem Workflow-Lauf verschiebt sich das Fenster
+# entsprechend der aktuellen Uhrzeit.
 #
 # ============================================================
 
-today = now_utc.date()
+window_start = (
+    now_utc -
+    timedelta(hours=3)
+)
 
-
-if now_utc.hour < 12:
-
-    # --------------------------------------------------------
-    # 00:00 -> 24:00
-    # --------------------------------------------------------
-
-    window_start = datetime.combine(
-        today,
-        datetime.min.time(),
-        tzinfo=timezone.utc
-    )
-
-    window_end = (
-        window_start +
-        timedelta(days=1)
-    )
-
-    window_name = "00:00 bis 24:00 UTC"
-
-
-else:
-
-    # --------------------------------------------------------
-    # 12:00 -> 12:00
-    # --------------------------------------------------------
-
-    window_start = (
-        datetime.combine(
-            today,
-            datetime.min.time(),
-            tzinfo=timezone.utc
-        )
-        +
-        timedelta(hours=12)
-    )
-
-    window_end = (
-        window_start +
-        timedelta(days=1)
-    )
-
-    window_name = "12:00 bis 12:00 UTC"
+window_end = (
+    now_utc +
+    timedelta(hours=21)
+)
 
 
 print("")
-print("========== EPG ZEITFENSTER ==========")
-print(f"Fenster:        {window_name}")
+print(
+    "========== EPG ZEITFENSTER =========="
+)
 
 print(
     "Von:            "
@@ -215,8 +207,13 @@ print(
     f"{window_end.strftime('%Y-%m-%d %H:%M:%S UTC')}"
 )
 
-print("Dauer:          24 Stunden")
-print("=====================================")
+print(
+    "Dauer:          24 Stunden"
+)
+
+print(
+    "====================================="
+)
 
 
 # ============================================================
@@ -237,6 +234,8 @@ new_root = ET.Element(
 
 channel_count = 0
 
+output_channel_ids = set()
+
 for channel in root.findall("channel"):
 
     channel_id = channel.get("id")
@@ -244,6 +243,10 @@ for channel in root.findall("channel"):
     if channel_id in CHANNELS:
 
         new_root.append(channel)
+
+        output_channel_ids.add(
+            channel_id
+        )
 
         channel_count += 1
 
@@ -342,7 +345,9 @@ skipped_programs = 0
 
 for programme in root.findall("programme"):
 
-    channel_id = programme.get("channel")
+    channel_id = programme.get(
+        "channel"
+    )
 
 
     # --------------------------------------------------------
@@ -357,7 +362,9 @@ for programme in root.findall("programme"):
     # STARTZEIT
     # --------------------------------------------------------
 
-    start = programme.get("start")
+    start = programme.get(
+        "start"
+    )
 
     if not start:
 
@@ -365,15 +372,15 @@ for programme in root.findall("programme"):
         continue
 
 
-    programme_start = parse_xmltv_datetime(
-        start
+    programme_start = (
+        parse_xmltv_datetime(start)
     )
 
     if programme_start is None:
 
         print(
-            "Warnung: Ungültiger Startzeitpunkt "
-            f"übersprungen: {start}"
+            "WARNUNG: Ungültiger "
+            f"Startzeitpunkt übersprungen: {start}"
         )
 
         skipped_programs += 1
@@ -395,7 +402,9 @@ for programme in root.findall("programme"):
     # STOPZEIT
     # --------------------------------------------------------
 
-    stop = programme.get("stop")
+    stop = programme.get(
+        "stop"
+    )
 
     programme_stop_utc = None
 
@@ -420,9 +429,6 @@ for programme in root.findall("programme"):
     #
     # Ein Programm wird übernommen, wenn es das
     # 24-Stunden-Fenster zumindest teilweise überschneidet.
-    #
-    # Dadurch werden Sendungen über Mitternacht korrekt
-    # berücksichtigt.
     #
     # ========================================================
 
@@ -452,45 +458,31 @@ for programme in root.findall("programme"):
     # Programm übernehmen
     # --------------------------------------------------------
 
-    new_root.append(programme)
+    new_root.append(
+        programme
+    )
 
     program_count += 1
 
 
-filter_time = time.perf_counter() - filter_start
-
-
-# ============================================================
-# XML SCHREIBEN
-# ============================================================
-#
-# Absichtlich KEIN ET.indent().
-#
-# Das spart Rechenzeit und Dateigröße.
-# XMLTV benötigt keine Einrückung.
-# ============================================================
-
-write_start = time.perf_counter()
-
-tree = ET.ElementTree(new_root)
-
-tree.write(
-    OUTPUT_FILE,
-    encoding="UTF-8",
-    xml_declaration=True
+filter_time = (
+    time.perf_counter() -
+    filter_start
 )
-
-write_time = time.perf_counter() - write_start
 
 
 # ============================================================
 # SENDERKONTROLLE
 # ============================================================
-
-output_channel_ids = {
-    channel.get("id")
-    for channel in new_root.findall("channel")
-}
+#
+# WICHTIG:
+#
+# Fehlende Sender sind KEIN FEHLER mehr.
+#
+# Der Workflow läuft trotzdem weiter und veröffentlicht
+# die tatsächlich vom Original-EPG gelieferten Sender.
+#
+# ============================================================
 
 missing_channels = (
     CHANNELS -
@@ -503,6 +495,99 @@ extra_channels = (
 )
 
 
+print("")
+print(
+    "========== SENDERKONTROLLE =========="
+)
+
+print(
+    f"Gewünschte Sender: "
+    f"{len(CHANNELS)}"
+)
+
+print(
+    f"Gefundene Sender:  "
+    f"{len(output_channel_ids)}"
+)
+
+
+if missing_channels:
+
+    print("")
+    print(
+        "WARNUNG: Folgende gewünschte "
+        "Sender fehlen im Original-EPG:"
+    )
+
+    for channel in sorted(
+        missing_channels
+    ):
+
+        print(
+            f"  - {channel}"
+        )
+
+    print("")
+    print(
+        "Dies ist KEIN Workflow-Fehler."
+    )
+
+    print(
+        "Die EPG wird trotzdem veröffentlicht."
+    )
+
+else:
+
+    print(
+        "Alle gewünschten Sender "
+        "sind vorhanden."
+    )
+
+
+if extra_channels:
+
+    print("")
+    print(
+        "WARNUNG: Folgende unerwartete "
+        "Sender wurden gefunden:"
+    )
+
+    for channel in sorted(
+        extra_channels
+    ):
+
+        print(
+            f"  - {channel}"
+        )
+
+
+print(
+    "====================================="
+)
+
+
+# ============================================================
+# XML SCHREIBEN
+# ============================================================
+
+write_start = time.perf_counter()
+
+tree = ET.ElementTree(
+    new_root
+)
+
+tree.write(
+    OUTPUT_FILE,
+    encoding="UTF-8",
+    xml_declaration=True
+)
+
+write_time = (
+    time.perf_counter() -
+    write_start
+)
+
+
 # ============================================================
 # DATEIGRÖSSE
 # ============================================================
@@ -511,23 +596,19 @@ size = os.path.getsize(
     OUTPUT_FILE
 )
 
-size_mb = size / 1_000_000
+size_mb = (
+    size /
+    1_000_000
+)
 
 
 # ============================================================
-# KONTROLLE
+# AUSGABEDATEI KONTROLLE
 # ============================================================
 
 print("")
-print("========== EPG KONTROLLE ==========")
-
 print(
-    f"Gewünschte Sender: {len(CHANNELS)}"
-)
-
-print(
-    f"Gefundene Sender:  "
-    f"{len(output_channel_ids)}"
+    "========== EPG KONTROLLE =========="
 )
 
 print(
@@ -543,58 +624,6 @@ if skipped_programs:
     )
 
 
-print("")
-
-
-if missing_channels:
-
-    print(
-        "FEHLER: Folgende gewünschte "
-        "Sender fehlen:"
-    )
-
-    for channel in sorted(
-        missing_channels
-    ):
-
-        print(
-            f"  - {channel}"
-        )
-
-else:
-
-    print(
-        "Alle gewünschten Sender "
-        "sind vorhanden."
-    )
-
-
-if extra_channels:
-
-    print("")
-
-    print(
-        "FEHLER: Folgende unerwartete "
-        "Sender sind enthalten:"
-    )
-
-    for channel in sorted(
-        extra_channels
-    ):
-
-        print(
-            f"  - {channel}"
-        )
-
-else:
-
-    print(
-        "Keine unerwünschten Sender "
-        "enthalten."
-    )
-
-
-print("")
 print(
     f"Originalgröße:      "
     f"{len(data) / 1_000_000:.2f} MB"
@@ -625,26 +654,9 @@ print(
     f"{write_time:.2f} Sekunden"
 )
 
-print("")
 print(
-    "===================================="
+    "====================================="
 )
-
-
-# ============================================================
-# SENDERFEHLER
-# ============================================================
-
-if (
-    missing_channels
-    or
-    extra_channels
-):
-
-    raise RuntimeError(
-        "EPG-Senderkontrolle "
-        "fehlgeschlagen."
-    )
 
 
 # ============================================================
@@ -657,9 +669,11 @@ if size > MAX_OUTPUT_SIZE:
     print(
         "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     )
+
     print(
         "FEHLER: EPG-DATEI IST ZU GROSS!"
     )
+
     print(
         "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     )
@@ -714,8 +728,7 @@ print(
 )
 
 print(
-    "Dateigröße liegt unter "
-    "0,49 MB."
+    "Die EPG wird veröffentlicht."
 )
 
 print(
@@ -731,6 +744,7 @@ print(
 )
 
 print("")
+
 print(
     "========== ZEITMESSUNG =========="
 )
