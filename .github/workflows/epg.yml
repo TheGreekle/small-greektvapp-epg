@@ -1,5 +1,6 @@
 name: Update EPG
 
+
 on:
 
   # ----------------------------------------------------------
@@ -10,14 +11,23 @@ on:
 
 
   # ----------------------------------------------------------
-  # Zweimal täglich
+  # Viermal täglich
   #
-  # 03:00 UTC => 00:00 bis 00:00 nächster Tag
-  # 15:00 UTC => 12:00 bis 12:00 nächster Tag
+  # 00:00 UTC
+  # 06:00 UTC
+  # 12:00 UTC
+  # 18:00 UTC
+  #
+  # Das Python-Skript erzeugt bei jedem Lauf ein 24-Stunden-
+  # Fenster:
+  #
+  # aktuelle UTC-Zeit - 3 Stunden
+  # bis
+  # aktuelle UTC-Zeit + 21 Stunden
   # ----------------------------------------------------------
 
   schedule:
-    - cron: "0 3,15 * * *"
+    - cron: "0 0,6,12,18 * * *"
 
 
 # ============================================================
@@ -128,12 +138,10 @@ jobs:
       # ======================================================
       # GITHUB PAGES DATEI ERSTELLEN
       #
-      # Die Python-Ausgabe heißt:
-      #
+      # Python:
       # public/epg_ssiptv.xml
       #
-      # Auf GitHub Pages soll sie aber heißen:
-      #
+      # GitHub Pages:
       # small-epg.xml
       # ======================================================
 
@@ -171,11 +179,6 @@ jobs:
 
       # ======================================================
       # CLOUDFLARE VERZEICHNIS VORBEREITEN
-      #
-      # Ziel:
-      #
-      # ssiptv-greek-epg/public/ssiptv-epg.xml
-      #
       # ======================================================
 
       - name: EPG für Cloudflare vorbereiten
@@ -239,11 +242,6 @@ jobs:
 
       # ======================================================
       # CLOUDFLARE EPG INS REPOSITORY COMMITTEN
-      #
-      # Cloudflare ist mit dem Repository verbunden.
-      #
-      # Der Push löst anschließend automatisch den
-      # Cloudflare Build aus.
       # ======================================================
 
       - name: Cloudflare EPG committen
@@ -306,4 +304,3 @@ jobs:
       - name: EPG veröffentlichen
         id: deployment
         uses: actions/deploy-pages@v5
-        
