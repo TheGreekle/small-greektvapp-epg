@@ -11,23 +11,28 @@ on:
 
 
   # ----------------------------------------------------------
-  # Viermal täglich
+  # Alle 3 Stunden
   #
-  # 00:00 UTC
-  # 06:00 UTC
-  # 12:00 UTC
-  # 18:00 UTC
+  # 00:17 UTC
+  # 03:17 UTC
+  # 06:17 UTC
+  # 09:17 UTC
+  # 12:17 UTC
+  # 15:17 UTC
+  # 18:17 UTC
+  # 21:17 UTC
   #
-  # Das Python-Skript erzeugt bei jedem Lauf ein 24-Stunden-
-  # Fenster:
+  # Das Python-Skript erzeugt bei jedem Lauf ein
+  # 24-Stunden-Fenster:
   #
   # aktuelle UTC-Zeit - 3 Stunden
   # bis
   # aktuelle UTC-Zeit + 21 Stunden
+  #
   # ----------------------------------------------------------
 
   schedule:
-    - cron: "0 0,6,12,18 * * *"
+    - cron: "17 0,3,6,9,12,15,18,21 * * *"
 
 
 # ============================================================
@@ -80,6 +85,9 @@ jobs:
       #
       # Ausgabe:
       # ./public/epg_ssiptv.xml
+      #
+      # Alle Sender des Original-EPG werden übernommen.
+      # Es bleiben nur 24 Stunden EPG übrig.
       # ------------------------------------------------------
 
       - name: EPG filtern
