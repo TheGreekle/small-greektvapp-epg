@@ -174,7 +174,7 @@ print(
 )
 
 print(
-    "Dauer:          24 Stunden"
+    "Dauer:          30 Stunden"
 )
 
 print(
