@@ -138,9 +138,9 @@ print(
 #
 #   aktuelle UTC-Zeit - 3 Stunden
 #   bis
-#   aktuelle UTC-Zeit + 21 Stunden
+#   aktuelle UTC-Zeit + 27 Stunden
 #
-# Dadurch entstehen exakt 24 Stunden.
+# Dadurch entstehen exakt 30 Stunden.
 #
 # Bei jedem Workflow-Lauf verschiebt sich das Fenster
 # entsprechend der aktuellen Uhrzeit.
@@ -154,7 +154,7 @@ window_start = (
 
 window_end = (
     now_utc +
-    timedelta(hours=21)
+    timedelta(hours=27)
 )
 
 
