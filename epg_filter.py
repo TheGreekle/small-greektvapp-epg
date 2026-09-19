@@ -13,52 +13,18 @@ from datetime import datetime, timedelta, timezone
 SOURCE_URL = "https://ext.greektv.app/epg/epg.xml"
 
 OUTPUT_DIR = "public"
+
 OUTPUT_FILE = os.path.join(
     OUTPUT_DIR,
     "epg_ssiptv.xml"
 )
 
 # Maximale erlaubte Dateigröße:
-# 490.000 Bytes ≈ 0,49 MB
-MAX_OUTPUT_SIZE = 490_000
-
-
-# ============================================================
-# GEWÜNSCHTE SENDER
-# ============================================================
-
-CHANNELS = {
-    "ert1",
-    "ert2",
-    "ert3",
-    "mega",
-    "ant1",
-    "alpha",
-    "skai",
-    "open",
-    "star",
-    "starint",
-    "tv100",
-    "onetv",
-    "mtv",
-    "vouli",
-    "ertworld",
-    "ertnews",
-    "meganews",
-    "pronews",
-    "ertsports",
-    "ertsports2",
-    "action24",
-    "riksat",
-    "omega",
-    "ant1cy",
-    "sigma",
-    "berginacy",
-    "rikhd",
-    "rik1",
-    "rik2",
-    "Naftemporikitv"
-}
+#
+# SS IPTV empfiehlt XMLTV-Dateien unter 5 MB.
+# Wir verwenden deshalb 4,9 MB als Sicherheitsgrenze.
+#
+MAX_OUTPUT_SIZE = 4_900_000
 
 
 # ============================================================
@@ -160,7 +126,7 @@ now_utc = datetime.now(timezone.utc)
 print("")
 print(
     "Aktuelle UTC-Zeit: "
-    f"{now_utc.strftime('%Y-%m-%d %H:%M:%S')}"
+    f"{now_utc.strftime('%Y-%m-%d %H:%M:%S UTC')}"
 )
 
 
@@ -229,7 +195,14 @@ new_root = ET.Element(
 
 
 # ============================================================
-# CHANNELS FILTERN
+# ALLE CHANNELS ÜBERNEHMEN
+# ============================================================
+#
+# Es gibt KEINE Senderliste mehr.
+#
+# Jeder <channel>-Eintrag aus dem Original-EPG
+# wird übernommen.
+#
 # ============================================================
 
 channel_count = 0
@@ -240,15 +213,37 @@ for channel in root.findall("channel"):
 
     channel_id = channel.get("id")
 
-    if channel_id in CHANNELS:
-
-        new_root.append(channel)
+    if channel_id:
 
         output_channel_ids.add(
             channel_id
         )
 
-        channel_count += 1
+    new_root.append(
+        channel
+    )
+
+    channel_count += 1
+
+
+print("")
+print(
+    "========== SENDER =========="
+)
+
+print(
+    f"Übernommene Sender: "
+    f"{channel_count}"
+)
+
+print(
+    "Alle Sender des Original-EPG "
+    "werden übernommen."
+)
+
+print(
+    "============================"
+)
 
 
 # ============================================================
@@ -264,6 +259,8 @@ def parse_xmltv_datetime(value):
     20260819120000 +0300
     20260819120000 +0200
     20260819120000
+
+    Bei fehlendem Offset wird UTC angenommen.
     """
 
     if not value:
@@ -327,8 +324,10 @@ def parse_xmltv_datetime(value):
         )
 
 
-    # Kein Offset vorhanden:
-    # als UTC behandeln.
+    # --------------------------------------------------------
+    # Kein Offset:
+    # als UTC behandeln
+    # --------------------------------------------------------
 
     return naive_datetime.replace(
         tzinfo=timezone.utc
@@ -338,23 +337,42 @@ def parse_xmltv_datetime(value):
 # ============================================================
 # PROGRAMME FILTERN
 # ============================================================
+#
+# Alle Programme werden geprüft.
+#
+# Übernommen werden nur Programme, die das
+# 24-Stunden-Fenster zumindest teilweise überschneiden.
+#
+# ============================================================
 
 program_count = 0
 skipped_programs = 0
 
+programs_without_stop = 0
+
 
 for programme in root.findall("programme"):
 
+    # --------------------------------------------------------
+    # CHANNEL-ID
+    # --------------------------------------------------------
+    #
+    # Da ALLE Sender übernommen werden, gibt es hier
+    # keine CHANNELS-Whitelist mehr.
+    #
     channel_id = programme.get(
         "channel"
     )
 
+    if not channel_id:
 
-    # --------------------------------------------------------
-    # Nur gewünschte Sender
-    # --------------------------------------------------------
+        skipped_programs += 1
 
-    if channel_id not in CHANNELS:
+        print(
+            "WARNUNG: Programm ohne "
+            "channel-ID übersprungen."
+        )
+
         continue
 
 
@@ -369,6 +387,12 @@ for programme in root.findall("programme"):
     if not start:
 
         skipped_programs += 1
+
+        print(
+            "WARNUNG: Programm ohne "
+            "Startzeit übersprungen."
+        )
+
         continue
 
 
@@ -384,11 +408,12 @@ for programme in root.findall("programme"):
         )
 
         skipped_programs += 1
+
         continue
 
 
     # --------------------------------------------------------
-    # Start in UTC
+    # START IN UTC
     # --------------------------------------------------------
 
     programme_start_utc = (
@@ -423,12 +448,31 @@ for programme in root.findall("programme"):
             )
 
 
+    # --------------------------------------------------------
+    # Kein Stop vorhanden
+    # --------------------------------------------------------
+
+    if programme_stop_utc is None:
+
+        programs_without_stop += 1
+
+
     # ========================================================
     # ZEITFENSTER-ÜBERSCHNEIDUNG
     # ========================================================
     #
     # Ein Programm wird übernommen, wenn es das
     # 24-Stunden-Fenster zumindest teilweise überschneidet.
+    #
+    # Mit Start + Stop:
+    #
+    #     stop <= window_start
+    #     oder
+    #     start >= window_end
+    #
+    # bedeutet:
+    #
+    #     keine Überschneidung
     #
     # ========================================================
 
@@ -472,97 +516,33 @@ filter_time = (
 
 
 # ============================================================
-# SENDERKONTROLLE
+# PROGRAMM-KONTROLLE
 # ============================================================
-#
-# WICHTIG:
-#
-# Fehlende Sender sind KEIN FEHLER mehr.
-#
-# Der Workflow läuft trotzdem weiter und veröffentlicht
-# die tatsächlich vom Original-EPG gelieferten Sender.
-#
-# ============================================================
-
-missing_channels = (
-    CHANNELS -
-    output_channel_ids
-)
-
-extra_channels = (
-    output_channel_ids -
-    CHANNELS
-)
-
 
 print("")
 print(
-    "========== SENDERKONTROLLE =========="
+    "========== PROGRAMME =========="
 )
 
 print(
-    f"Gewünschte Sender: "
-    f"{len(CHANNELS)}"
+    f"Übernommene Programme: "
+    f"{program_count}"
 )
 
 print(
-    f"Gefundene Sender:  "
-    f"{len(output_channel_ids)}"
+    f"Übersprungene Programme: "
+    f"{skipped_programs}"
 )
 
-
-if missing_channels:
-
-    print("")
-    print(
-        "WARNUNG: Folgende gewünschte "
-        "Sender fehlen im Original-EPG:"
-    )
-
-    for channel in sorted(
-        missing_channels
-    ):
-
-        print(
-            f"  - {channel}"
-        )
-
-    print("")
-    print(
-        "Dies ist KEIN Workflow-Fehler."
-    )
+if programs_without_stop:
 
     print(
-        "Die EPG wird trotzdem veröffentlicht."
+        f"Programme ohne Stopzeit: "
+        f"{programs_without_stop}"
     )
-
-else:
-
-    print(
-        "Alle gewünschten Sender "
-        "sind vorhanden."
-    )
-
-
-if extra_channels:
-
-    print("")
-    print(
-        "WARNUNG: Folgende unerwartete "
-        "Sender wurden gefunden:"
-    )
-
-    for channel in sorted(
-        extra_channels
-    ):
-
-        print(
-            f"  - {channel}"
-        )
-
 
 print(
-    "====================================="
+    "==============================="
 )
 
 
@@ -612,17 +592,21 @@ print(
 )
 
 print(
-    f"Programme:         "
+    f"Sender:             "
+    f"{channel_count}"
+)
+
+print(
+    f"Programme:          "
     f"{program_count}"
 )
 
 if skipped_programs:
 
     print(
-        "Übersprungene ungültige "
-        f"Programme: {skipped_programs}"
+        f"Übersprungene:      "
+        f"{skipped_programs}"
     )
-
 
 print(
     f"Originalgröße:      "
@@ -704,7 +688,7 @@ if size > MAX_OUTPUT_SIZE:
 
     raise RuntimeError(
         "EPG-Datei überschreitet "
-        "das Limit von 0,49 MB."
+        "das Limit von 4,90 MB."
     )
 
 
@@ -729,6 +713,16 @@ print(
 
 print(
     "Die EPG wird veröffentlicht."
+)
+
+print(
+    f"Sender: "
+    f"{channel_count}"
+)
+
+print(
+    f"Programme: "
+    f"{program_count}"
 )
 
 print(
